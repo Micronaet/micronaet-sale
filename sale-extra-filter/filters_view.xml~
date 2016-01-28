@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_sales_order_filter_search">
+            <field name="name">sale.order.extra.search</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="date_deadline"/>
+                    <field name="date_deadline" string="From deadline" filter_domain="[('date_deadline','&gt;=',self)]"/>
+                    <field name="date_deadline" string="To deadline" filter_domain="[('date_deadline','&lt;=',self)]"/>
+                    <field name="position_id" />
+                    <!--<filter name="Italy" string="Italy" domain="[('position_id.name','=','Italy')]"/>-->
+                </field>
+                <xpath expr="//group[@string='Group By']/filter[1]" position="after">
+                    <filter name="group_fiscal" string="Fiscal position" context="{'group_by': 'position_id'}"/>
+                    <filter name="group_deadline" string="Deadline month" context="{'group_by': 'date_deadline'}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_sale_order_extra_data_tree">
+            <field name="name">sale.order.tree</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_tree"/>
+            <field name="arch" type="xml">
+                <field name="date_order" position="after">
+                    <field name="client_order_ref" />
+                    <field name="position_id"/>
+                    <field name="date_deadline"/>
+                </field>
+            </field>
+        </record>
+        
+    </data>
+</openerp>
+
