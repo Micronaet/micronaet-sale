@@ -47,7 +47,7 @@ class SaleOrder(orm.Model):
         ''' Store when change in partner
         '''
         #select distinct order_id from sale_order_line where id in %s
-        self.pool.get('sale.order')
+        order_pool = self.pool.get('sale.order')
         return order_pool.search(cr, uid, [
             ('partner_id', 'in', ids)], context=context)
 
