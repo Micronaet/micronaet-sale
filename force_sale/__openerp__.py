@@ -37,7 +37,7 @@
     'demo': [],
     'data': [
         'security/over_group.xml',    
-        'oversale_view.xml',
+        'force_view.xml',
         ],
     'active': False,
     'installable': True,

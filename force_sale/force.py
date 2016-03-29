@@ -41,10 +41,42 @@ _logger = logging.getLogger(__name__)
 class SaleOrderLine(orm.Model):
     """ Model name: SaleOrderLine
     """    
-    _inherit = 'sale.order'
+    _inherit = 'sale.order.line'
 
-    _columns = {
-        'product_uom_force_qty': fields.float(
-            'Forced', digits=(16, 2), help='Force extra qty to confirm'),        
-        }
+    def update_setted_force(self, cr, uid, ids, context=None):
+        '''
+        '''
+        assert len(ids) == 1, 'Force once order a time!'
+        
+        # pool used:
+        sol_pool = self.pool.get('sale.order.line')
+        
+        sol_ids = sol_pool.search(cr, uid, [
+            ('order_id', '=', ids[0]),
+            ('product_uom_force_qty', '>', 0),
+            ], context=context)
+        
+        sol_update = {}
+        for line in sol_pool.browse(cr, uid, sol_ids, context=context):
+            # No extra sale forced down:
+            sol_update[
+                line.id] = line.product_uom_qty - line.product_uom_force_qty
+        
+            # No extra production forced down:
+        
+        # upate context to force CL (SL?)
+        for item_id in sol_update:
+            qty = sol_update[item_id]
+            
+            import pdb; pdb.set_trace()
+            # Before force persistent:
+            sol_pool._recreate_production_sol_move(cr, uid, [item_ids], 
+                context=context)
+            
+            # After write maked:
+            sol_pool.write(cr, uid, item_id, {
+                'product_uom_qty': qty,
+                'product_uom_maked_sync_qty': qty,                
+                }, context=context)
+        return True
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
