@@ -32,6 +32,7 @@
         'sale',
         'mx_sale',
         'production_accounting_external',
+        'production_load_stock',
         ],
     'init_xml': [],
     'demo': [],

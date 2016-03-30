@@ -59,6 +59,7 @@ class SaleOrder(orm.Model):
         ctx = context.copy()
         sol_update = {}
         for line in sol_pool.browse(cr, uid, sol_ids, context=context):
+            # TODO check that is product or 
             ctx['force_persistent'] = True
             sol_pool._recreate_production_sol_move(cr, uid, [line.id], 
                 context=ctx)
@@ -66,7 +67,6 @@ class SaleOrder(orm.Model):
             # No extra sale forced down:
             sol_update[
                 line.id] = line.product_uom_qty - line.product_uom_force_qty
-        
             # No extra production forced down:
         
         # upate context to force CL (SL?)
