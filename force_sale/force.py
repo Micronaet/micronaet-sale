@@ -38,10 +38,10 @@ from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
 
 _logger = logging.getLogger(__name__)
 
-class SaleOrderLine(orm.Model):
+class SaleOrder(orm.Model):
     """ Model name: SaleOrderLine
     """    
-    _inherit = 'sale.order.line'
+    _inherit = 'sale.order'
 
     def update_setted_force(self, cr, uid, ids, context=None):
         '''
@@ -58,10 +58,9 @@ class SaleOrderLine(orm.Model):
 
         ctx = context.copy()
         sol_update = {}
-        import pdb; pdb.set_trace()
         for line in sol_pool.browse(cr, uid, sol_ids, context=context):
             ctx['force_persistent'] = True
-            sol_pool._recreate_production_sol_move(cr, uid, [item_ids], 
+            sol_pool._recreate_production_sol_move(cr, uid, [line.id], 
                 context=ctx)
 
             # No extra sale forced down:
@@ -73,13 +72,11 @@ class SaleOrderLine(orm.Model):
         # upate context to force CL (SL?)
         for item_id in sol_update:
             qty = sol_update[item_id]
-            
-            
-            # After write maked:
-            sol_pool.write(cr, uid, item_id, {
+            sol_pool.write(cr, uid, [item_id], {
                 'product_uom_qty': qty,
                 'product_uom_maked_sync_qty': qty,                
                 'product_uom_force_qty': 0, 
                 }, context=context)
         return True
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
