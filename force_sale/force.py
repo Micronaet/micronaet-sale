@@ -55,9 +55,15 @@ class SaleOrderLine(orm.Model):
             ('order_id', '=', ids[0]),
             ('product_uom_force_qty', '>', 0),
             ], context=context)
-        
+
+        ctx = context.copy()
         sol_update = {}
+        import pdb; pdb.set_trace()
         for line in sol_pool.browse(cr, uid, sol_ids, context=context):
+            ctx['force_persistent'] = True
+            sol_pool._recreate_production_sol_move(cr, uid, [item_ids], 
+                context=ctx)
+
             # No extra sale forced down:
             sol_update[
                 line.id] = line.product_uom_qty - line.product_uom_force_qty
@@ -68,15 +74,12 @@ class SaleOrderLine(orm.Model):
         for item_id in sol_update:
             qty = sol_update[item_id]
             
-            import pdb; pdb.set_trace()
-            # Before force persistent:
-            sol_pool._recreate_production_sol_move(cr, uid, [item_ids], 
-                context=context)
             
             # After write maked:
             sol_pool.write(cr, uid, item_id, {
                 'product_uom_qty': qty,
                 'product_uom_maked_sync_qty': qty,                
+                'product_uom_force_qty': 0, 
                 }, context=context)
         return True
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
