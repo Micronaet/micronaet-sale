@@ -49,7 +49,7 @@ class SaleOrder(orm.Model):
         assert len(ids) == 1, 'Force once order a time!'
         
         order_proxy = self.browse(cr, uid, ids, context=context)[0]
-        force_value = order_proxy.force_value or 100.0 # default 100%
+        force_value = order_proxy.force_value or 0.0 # default 100%
 
         # pool used:
         sol_pool = self.pool.get('sale.order.line')
