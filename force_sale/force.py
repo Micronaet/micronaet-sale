@@ -43,11 +43,40 @@ class SaleOrder(orm.Model):
     """    
     _inherit = 'sale.order'
 
-    def update_setted_force(self, cr, uid, ids, context=None):
+    def set_force_value(self, cr, uid, ids, context=None):
         '''
         '''
         assert len(ids) == 1, 'Force once order a time!'
         
+        order_proxy = self.browse(cr, uid, ids, context=context)[0]
+        force_value = order_proxy.force_value or 100.0 # default 100%
+
+        # pool used:
+        sol_pool = self.pool.get('sale.order.line')
+        
+        sol_ids = sol_pool.search(cr, uid, [
+            ('order_id', '=', ids[0]),
+            ], context=context)
+
+        sol_update = {}
+        for line in sol_pool.browse(cr, uid, sol_ids, context=context):
+            sol_update[line.id] = round(
+                line.product_uom_qty * force_value / 100.0, 0)
+        
+        # upate context to force CL (SL?)
+        for item_id in sol_update:
+            sol_pool.write(cr, uid, [item_id], {
+                'product_uom_force_qty': sol_update[item_id], 
+                }, context=context)
+        self.write(cr, uid, ids, {
+            'force_value': False}, context=context)        
+        return True
+
+    def update_setted_force(self, cr, uid, ids, context=None):
+        '''
+        '''
+        assert len(ids) == 1, 'Force once order a time!'
+
         # pool used:
         sol_pool = self.pool.get('sale.order.line')
         
@@ -78,5 +107,10 @@ class SaleOrder(orm.Model):
                 'product_uom_force_qty': 0, 
                 }, context=context)
         return True
+
+    _columns = {
+        'force_value': fields.float('Force value', digits=(8, 2),
+            help='Set order force value es.: OC 10, value 60%, force 6'), 
+        }
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

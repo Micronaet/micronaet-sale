@@ -7,6 +7,8 @@
             <field name="inherit_id" ref="sale.view_order_form" />
             <field name="arch" type="xml">
                 <xpath expr="//page/field[@name='order_line']" position="before">
+                    <button name="set_force_value" string="Set force value" type="object" groups="force_sale.group_force_manager" alert="Are you sure to set force value to perc. value indicated?" colspan="1"/>
+                    <field name="force_value" colspan="1"/>
                     <button name="update_setted_force" string="Force" type="object" groups="force_sale.group_force_manager" alert="Are you sure to force!"/>
                 </xpath>                
                 <xpath expr="//page/field[@name='order_line']/tree/field[@name='product_uom_qty']" position="after">
