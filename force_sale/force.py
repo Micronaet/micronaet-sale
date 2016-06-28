@@ -43,6 +43,32 @@ class SaleOrder(orm.Model):
     """    
     _inherit = 'sale.order'
 
+    def get_message_list(self, cr, uid, ids, context=None):
+        '''
+        '''
+        assert len(ids) == 1, 'Force once order a time!'
+        
+        mail_pool = self.pool.get('mail.message')
+        mail_ids = mail_pool.search(cr, uid, [
+            ('res_id', '=', ids[0]),
+            ('model', '=', 'sale.order'),
+            ], context=context)
+    
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Message for order'),
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            #'res_id': 1,
+            'res_model': 'mail.message',
+            #'view_id': view_id, # False
+            'views': [(False, 'tree'), (False, 'form')],
+            'domain': [('id', 'in', mail_ids)],
+            'context': context,
+            #'target': 'current', # 'new'
+            'nodestroy': False,
+            }
+
     def set_force_value(self, cr, uid, ids, context=None):
         '''
         '''
