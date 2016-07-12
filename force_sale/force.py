@@ -124,6 +124,7 @@ class SaleOrder(orm.Model):
             order_qty = line.product_uom_qty
             
             if not force_qty:
+                sol_partial.append(line.id)
                 continue
 
             # Check force value for line analysis
