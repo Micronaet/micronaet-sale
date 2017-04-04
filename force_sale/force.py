@@ -190,7 +190,7 @@ class SaleOrder(orm.Model):
         return True
 
     _columns = {
-        'force_value': fields.float('Force value', digits=(8, 2),
-            help='Set order force value es.: OC 10, value 60%, force OC to 6'), 
+        'force_value': fields.float('Force discount', digits=(8, 2),
+            help='Set order force value es.: OC 10, value 10%, force OC to 9'), 
         }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
