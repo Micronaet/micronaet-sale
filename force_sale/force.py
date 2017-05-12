@@ -58,6 +58,21 @@ class SaleOrder(orm.Model):
     """    
     _inherit = 'sale.order'
 
+    def readability_sale_force(self, cr, uid, ids, context=None):
+        ''' Reload OC9 data
+        '''
+        self.write(cr, uid, ids, {
+            'mx_closed': False,
+            }, context=context)
+        sol_pool = self.pool.get('sale.order.line')
+        sol_ids = sol_pool.search(cr, uid, [
+            ('order_id', '=', ids[0])], context=context)
+        sol_pool.write(cr, uid, sol_ids, {
+            'mx_closed': False,        
+            }, context=context)    
+        return self.force_parameter_for_delivery_one(
+            cr, uid, ids, context=context)
+        
     def get_message_list(self, cr, uid, ids, context=None):
         '''
         '''
@@ -112,7 +127,7 @@ class SaleOrder(orm.Model):
                 'product_uom_force_qty': sol_update[item_id], 
                 }, context=context)
         self.write(cr, uid, ids, {
-            'force_value': False}, context=context)        
+            'force_value': False}, context=context)
         return True
 
     def update_setted_force(self, cr, uid, ids, context=None):
@@ -182,11 +197,13 @@ class SaleOrder(orm.Model):
             sol_pool.unlink(cr, uid, sol_all, context=context)
         
         # Clean order:    
-        if not sol_partial:
+        if sol_partial:
+            self.readability_sale_force(cr, uid, ids, context=context)
+        else:
             # Put in cancel state for unlink operation:
             self.write(cr, uid, ids, {
                 'state': 'cancel'}, context=context)
-            self.unlink(cr, uid, ids, context=context)
+            self.unlink(cr, uid, ids, context=context)            
         return True
 
     _columns = {
