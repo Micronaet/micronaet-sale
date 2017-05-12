@@ -10,7 +10,7 @@
                     <button name="set_force_value" string="Imposta sconto su righe" type="object" groups="force_sale.group_force_manager" colspan="1"/>
                     <field name="force_value" colspan="1" groups="force_sale.group_force_manager"/>
                     <button name="update_setted_force" string="Force discount" type="object" groups="force_sale.group_force_manager" assert="Are you sure to force the discount setup in line?"/>
-                    <!--<button name="readability_sale_force" string="Leggibilita' 0C9" type="object" groups="force_sale.group_force_manager" help="Ricarica leggibilita' B e S in OC9"/>                    -->
+                    <button name="readability_sale_force" string="Refresh 0C9" type="object" groups="force_sale.group_force_manager" help="Ricarica leggibilita' B e S in OC9"/>
                     <button name="get_message_list" string="Lista messaggi" type="object" groups="force_sale.group_force_manager" colspan="1" icon="terp-mail-message-new"/>
                 </xpath>                
                 <xpath expr="//page/field[@name='order_line']/tree/field[@name='product_uom_qty']" position="after">
