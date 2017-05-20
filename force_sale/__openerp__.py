@@ -30,6 +30,7 @@
     'depends': [
         'base',
         'sale',
+        'stock',
         'mx_sale',
         'production_accounting_external',
         'production_load_stock',

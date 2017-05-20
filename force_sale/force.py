@@ -38,6 +38,17 @@ from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
 
 _logger = logging.getLogger(__name__)
 
+
+class StockPicking(orm.Model):
+    """ Model name: StockPicking
+    """
+    
+    _inherit = 'stock.picking'
+
+    _columns = {
+        'force_pick_ref': fields.char('Pick ref', size=10),
+        }
+
 class SaleOrderLineError(orm.Model):
     """ Model name: SaleOrderLineError
         History error calculating discount
@@ -45,11 +56,50 @@ class SaleOrderLineError(orm.Model):
     _name = 'sale.order.line.error'
     _description = 'Line error unload'
     
+    def get_force_pick(self, cr, uid, force_pick_ref, context=None):
+        '''
+        '''
+        pick_pool = self.pool.get('stock.picking')
+        pick_ids = pick_pool.search(cr, uid, [
+            ('force_pick_ref', '=', force_pick_ref),
+            ], context=context) 
+        if pick_ids:
+            return pick_ids[0]
+            
+        # TODO create picking header document with move type:
+        return pick_pool.create(cr, uid, {
+            
+            'force_pick_ref': force_pick_ref,
+            }, context=context)
+        
+    def link_sl_document(self, cr, uid, context=None):
+        ''' Link SL document
+        '''
+        error_ids = self.search(cr, uid, [
+            ('sl_id', '=', False),
+            ], context=context)
+        pick_ids = {}
+        
+        for line in self.browse(cr, uid, error_ids, context=context):
+            date = line.date
+            force_pick_ref = '%s%s' % (date[5:7], date[:4])
+            if force_pick_ref not in pick_ids:
+                pick_ids[force_pick_ref] = self.get_force_pick(
+                    cr, uid, force_pick_ref, context=context) 
+            pick_id = pick_ids[force_pick_ref]
+            # TODO Create move for that picking:
+            # TODO Create quants for that picking:
+            
+        
+        return True
+        
     _columns = {
         'error_qty': fields.float('Error value', digits=(8, 2)),
         'product_id': fields.many2one('product.product', 'Product'),
         'date': fields.date('Date'),    
         'note': fields.text('Note'),
+        'sl_id': fields.many2one(
+            'stock.picking', 'SL link'),
         }
     
 
