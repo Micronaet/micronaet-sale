@@ -1,0 +1,130 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* force_sale
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-07-27 16:25+0000\n"
+"PO-Revision-Date: 2017-08-05 22:21+0100\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: it\n"
+"X-Generator: Poedit 1.6.10\n"
+
+#. module: force_sale
+#: field:sale.order.line.error,create_uid:0
+msgid "Created by"
+msgstr "Creato da"
+
+#. module: force_sale
+#: field:sale.order.line.error,create_date:0
+msgid "Created on"
+msgstr "Creato il"
+
+#. module: force_sale
+#: field:sale.order.line.error,date:0
+msgid "Date"
+msgstr "Data"
+
+#. module: force_sale
+#: field:sale.order.line.error,error_qty:0
+msgid "Error value"
+msgstr "Errore valore"
+
+#. module: force_sale
+#: model:res.groups,name:force_sale.group_force_manager
+msgid "Force Manager"
+msgstr "Forza manager"
+
+#. module: force_sale
+#: view:sale.order:force_sale.view_sale_order_force_form_view
+#: field:sale.order,force_value:0
+msgid "Force discount"
+msgstr "Forza sconto"
+
+#. module: force_sale
+#: field:sale.order.line.error,id:0
+msgid "ID"
+msgstr "ID"
+
+#. module: force_sale
+#: view:sale.order:force_sale.view_sale_order_force_form_view
+msgid "Imposta sconto su righe"
+msgstr "Imposta sconto su righe"
+
+#. module: force_sale
+#: field:sale.order.line.error,write_uid:0
+msgid "Last Updated by"
+msgstr "Aggiornato da"
+
+#. module: force_sale
+#: field:sale.order.line.error,write_date:0
+msgid "Last Updated on"
+msgstr "Aggiornato il"
+
+#. module: force_sale
+#: model:ir.model,name:force_sale.model_sale_order_line_error
+msgid "Line error unload"
+msgstr "Errore riga scarico"
+
+#. module: force_sale
+#: view:sale.order:force_sale.view_sale_order_force_form_view
+msgid "Lista messaggi"
+msgstr "Lista messaggi"
+
+#. module: force_sale
+#: code:addons/force_sale/force.py:139
+#, python-format
+msgid "Message for order"
+msgstr "Messaggio per ordine"
+
+#. module: force_sale
+#: field:sale.order.line.error,note:0
+msgid "Note"
+msgstr "Note"
+
+#. module: force_sale
+#: field:stock.picking,force_pick_ref:0
+msgid "Pick ref"
+msgstr "Rif. prelievo"
+
+#. module: force_sale
+#: model:ir.model,name:force_sale.model_stock_picking
+msgid "Picking List"
+msgstr "Lista prelievo"
+
+#. module: force_sale
+#: field:sale.order.line.error,product_id:0
+msgid "Product"
+msgstr "Prodotto"
+
+#. module: force_sale
+#: view:sale.order:force_sale.view_sale_order_force_form_view
+msgid "Refresh 0C9"
+msgstr "Rigenera 0C9"
+
+#. module: force_sale
+#: view:sale.order:force_sale.view_sale_order_force_form_view
+msgid "Ricarica leggibilita' B e S in OC9"
+msgstr "Ricarica leggibilita' B e S in OC9"
+
+#. module: force_sale
+#: field:sale.order.line.error,sl_id:0
+msgid "SL link"
+msgstr "SL collegamento"
+
+#. module: force_sale
+#: model:ir.model,name:force_sale.model_sale_order
+msgid "Sales Order"
+msgstr "Ordine di vendita"
+
+#. module: force_sale
+#: help:sale.order,force_value:0
+msgid "Set order force value es.: OC 10, value 10%, force OC to 9"
+msgstr "Imposta forzatura valore ordone, es.: OC 10, valore 10%, forza OC a 9"
