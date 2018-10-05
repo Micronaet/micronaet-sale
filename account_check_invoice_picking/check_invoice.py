@@ -52,7 +52,7 @@ class AccountInvoice(orm.Model):
         ''' Search this year invoice and check them
         '''
         invoice_ids = self.search(cr, uid, [
-            ('date_invoice', '>=', '2017-01-01'), # TODO
+            ('date_invoice', '>=', '2018-01-01'), # TODO
             ], order='number', context=context)
         return self.check_invoice_line(cr, uid, invoice_ids, context=context)
 
