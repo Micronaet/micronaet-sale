@@ -180,7 +180,7 @@ class AccountInvoice(orm.Model):
                             move.picking_id.name,
                             default_code,
                             '', #move.product_id.default_code,
-                            line.product_qty,
+                            line.quantity,
                             '', #move.product_uom_qty,
                             'No picking!',
                             ])
@@ -190,7 +190,7 @@ class AccountInvoice(orm.Model):
                             move.picking_id.name,
                             default_code,
                             '', #move.product_id.default_code,
-                            line.product_qty,
+                            line.quantity,
                             '', #move.product_uom_qty,
                             'No picking!',
                             ])
