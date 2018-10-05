@@ -72,6 +72,11 @@ class AccountInvoice(orm.Model):
             'PALLET',
             'SC.EXTRA',
             'BANNER',
+            'TRASP',
+            'VA',
+            'NMO',
+            'VARIE4',
+            'FATSCA',            
             ]
         
         # ---------------------------------------------------------------------
@@ -175,7 +180,7 @@ class AccountInvoice(orm.Model):
                             move.picking_id.name,
                             default_code,
                             '', #move.product_id.default_code,
-                            '', #line.product_qty,
+                            line.product_qty,
                             '', #move.product_uom_qty,
                             'No picking!',
                             ])
@@ -185,7 +190,7 @@ class AccountInvoice(orm.Model):
                             move.picking_id.name,
                             default_code,
                             '', #move.product_id.default_code,
-                            '', #line.product_qty,
+                            line.product_qty,
                             '', #move.product_uom_qty,
                             'No picking!',
                             ])
@@ -242,7 +247,10 @@ class AccountInvoice(orm.Model):
         for move in move_db.values():
             write_line(WS, 'unlinked', counter, [
                 '',#invoice.number,
-                move.picking_id.name,
+                '%s dated %s' % (
+                    move.picking_id.name,
+                    move.picking_id.min_date,
+                    ),
                 '',#line.product_id.default_code,
                 move.product_id.default_code,
                 '',#line.quantity,
