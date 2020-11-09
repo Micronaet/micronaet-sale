@@ -51,9 +51,14 @@ class AccountInvoice(orm.Model):
     def check_invoice_line_scheduled(self, cr, uid, context=None):
         ''' Search this year invoice and check them
         '''
+        if context is None:
+            context = {}
+        from_date = context.get('from_date', '2019-01-01') 
+        
         invoice_ids = self.search(cr, uid, [
-            ('date_invoice', '>=', '2019-01-01'), # TODO
+            ('date_invoice', '>=', from_date), # TODO
             ], order='number', context=context)
+        _logger.warning('Check invoice from date: %s' % from_date)    
         return self.check_invoice_line(cr, uid, invoice_ids, context=context)
 
     # -------------------------------------------------------------------------
