@@ -56,9 +56,10 @@ class AccountInvoice(orm.Model):
         from_date = context.get('from_date', '2019-01-01') 
         
         invoice_ids = self.search(cr, uid, [
-            ('date_invoice', '>=', from_date), # TODO
+            ('date_invoice', '>=', from_date),
             ], order='number', context=context)
-        _logger.warning('Check invoice from date: %s' % from_date)    
+        _logger.warning('Check invoice from date: %s # %s' % (
+            from_date, len(invoice_ids)))
         return self.check_invoice_line(cr, uid, invoice_ids, context=context)
 
     # -------------------------------------------------------------------------
@@ -265,5 +266,4 @@ class AccountInvoice(orm.Model):
 
         WB.close()
         return True
-            
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+
