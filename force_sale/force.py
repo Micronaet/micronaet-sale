@@ -47,6 +47,11 @@ class StockPicking(orm.Model):
 
     _columns = {
         'force_pick_ref': fields.char('Pick ref', size=10),
+        'active': fields.boolean('Attivo'),
+        }
+
+    _defaults = {
+        'active': lambda *x: True,
         }
 
 
