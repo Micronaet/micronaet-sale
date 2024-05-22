@@ -57,20 +57,25 @@ class SaleOrderLineError(orm.Model):
     _name = 'sale.order.line.error'
     _description = 'Line error unload'
 
-    def get_force_pick(self, cr, uid, force_pick_ref, context=None):
+    def get_force_pick(self, cr, uid, picking_type, context=None):
+        """ Generate template picking
         """
-        """
+        company_id = 1
         pick_pool = self.pool.get('stock.picking')
-        pick_ids = pick_pool.search(cr, uid, [
-            ('force_pick_ref', '=', force_pick_ref),
-            ], context=context)
-        if pick_ids:
-            return pick_ids[0]
 
-        # todo create picking header document with move type:
-        return pick_pool.create(cr, uid, {
-            'force_pick_ref': force_pick_ref,
-            }, context=context)
+        now = str(datetime.now())[:19]
+        date = now[:10]
+        data = {
+            # 'production_load_type': mode,
+            'date': date,
+            'min_date': date,
+            'origin': '',
+            'partner_id': company_id,
+            'picking_type_id': picking_type.id,
+            'state': 'done',
+            'force_pick_ref': date,
+            }
+        return pick_pool.create(cr, uid, data, context=context)
 
     def link_sl_document(self, cr, uid, context=None):
         """ Link SL document
@@ -98,6 +103,7 @@ class SaleOrderLineError(orm.Model):
         'note': fields.text('Note'),
         'sl_id': fields.many2one(
             'stock.picking', 'SL link'),
+        'done': fields.boolean('Done'),
         }
 
 
