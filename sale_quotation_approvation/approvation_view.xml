@@ -9,7 +9,10 @@
                 <button name="action_button_confirm" position="before">
                     <button name="action_button_request_approve" string="Richiesta approvazione"
                         type="object" icon="gtk-help"
-                        attrs="{'invisible': [('state', 'not in', ('draft', 'sent'))]}"/>
+                        attrs="{'invisible': ['|', ('request_approvation', '=', True), ('state', 'not in', ('draft', 'sent'))]}"/>
+                    <!--<button name="action_button_request_approve" string="Annulla Richiesta approvazione"
+                        type="object" icon="gtk-help"
+                        attrs="{'invisible': [('request_approvation', '=', False), ('state', 'not in', ('draft', 'sent'))]}"/>-->
                     <field name="request_approvation" invisible="1"/>
                 </button>
             </field>
