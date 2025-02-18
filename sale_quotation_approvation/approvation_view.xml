@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_sale_order_approve_button_form_view">
+            <field name="name">Approve button</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form" />
+            <field name="arch" type="xml">
+                <button name="action_button_confirm" position="before">
+                    <button name="action_button_request_approve" string="Richiesta approvazione"
+                        type="object" icon="gtk-help"
+                        attrs="{'invisible': [['state', 'not in', ['draft', 'sent']]]}"/>
+                    <field name="request_approvation" invisible="1"/>
+                </button>
+            </field>
+        </record>
+        <record id="sale_order_approve_action" model="ir.actions.act_window">
+            <field name="name">Richiesta approvazione</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', 'in', ('draft', 'sent'), ('request_approvation', '=', True)]</field>
+        </record>
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="menu_sale_order_approve"
+              groups="sale_quotation_approvation.group_sale_order_approvation_manager"
+              name="Ordini da approvare" parent="base.menu_sales" action="sale_order_approve_action" sequence="5"/>
+    </data>
+</openerp>
+

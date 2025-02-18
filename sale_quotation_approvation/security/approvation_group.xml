@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+        <record id="group_sale_order_approvation_manager" model="res.groups">
+            <field name="name">Sale order approvation Manager</field>
+        </record>
+   </data>
+</openerp>
