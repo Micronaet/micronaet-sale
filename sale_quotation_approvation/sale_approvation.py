@@ -44,7 +44,7 @@ class SaleOrder(orm.Model):
     """
     _inherit = 'sale.order'
 
-    def action_button_request_approve(self):
+    def action_button_request_approve(self, cr, uid, ids, context=None):
         """ Set order for request approvation
         """
         return self.write(cr, uid, ids, {
