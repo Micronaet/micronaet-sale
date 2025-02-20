@@ -71,7 +71,7 @@ class SaleOrder(orm.Model):
         # Send Message
         self.send_telegram_approvation_message(
             cr, uid, ids,
-            message='Offerta **non** confermata!:',
+            message='Offerta non confermata!:',
             context=context)
 
         return self.write(cr, uid, ids, {
