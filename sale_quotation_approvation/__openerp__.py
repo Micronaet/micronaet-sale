@@ -30,6 +30,7 @@
     'depends': [
         'base',
         'sale',
+        'telegram_message_system',
         ],
     'init_xml': [],
     'demo': [],
