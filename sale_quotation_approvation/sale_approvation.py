@@ -48,6 +48,10 @@ class SaleOrder(orm.Model):
     def action_button_confirm(self, cr, uid, ids, context=None):
         """ Override to send message here:
         """
+        # Regular inherited action:
+        res = super(SaleOrder, self).action_button_confirm(
+            cr, uid, ids, context=context)
+
         # Send message for request confirmation:
         try:
             telegram_pool = self.pool.get('telegram.bot')
@@ -64,8 +68,7 @@ class SaleOrder(orm.Model):
         except:
             _logger.error('Cannot send Telegram Message')
 
-        super(SaleOrder, self).action_button_confirm(
-            cr, uid, ids, context=context)
+        return res
 
     def action_button_request_approve(self, cr, uid, ids, context=None):
         """ Set order for request confirmation
