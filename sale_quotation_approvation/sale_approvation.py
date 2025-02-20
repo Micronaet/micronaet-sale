@@ -68,6 +68,12 @@ class SaleOrder(orm.Model):
     def action_button_request_approve_deny(self, cr, uid, ids, context=None):
         """ Deny approvation
         """
+        # Send Message
+        self.send_telegram_approvation_message(
+            cr, uid, ids,
+            message='Offerta **non** confermata!:',
+            context=context)
+
         return self.write(cr, uid, ids, {
             'request_approvation': False,  # Restored flag (hide deny button)
         }, context=context)
@@ -87,7 +93,9 @@ class SaleOrder(orm.Model):
             context=context)
 
         # Restore flag:
-        self.action_button_request_approve_deny(cr, uid, ids, context=context)
+        return self.write(cr, uid, ids, {
+            'request_approvation': False,  # Restored flag (hide deny button)
+        }, context=context)
 
         return res
 
