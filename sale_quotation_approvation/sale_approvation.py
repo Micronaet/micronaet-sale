@@ -66,8 +66,8 @@ class SaleOrder(orm.Model):
                     channel, message,
                     item_id=order_id, reference=order.name)
         except:
-            _logger.error('Cannot send Telegram Message')
-
+            _logger.error('Cannot send Telegram Message\{}'.format(
+                sys.exc_info()))
         return res
 
     def action_button_request_approve(self, cr, uid, ids, context=None):
@@ -87,7 +87,8 @@ class SaleOrder(orm.Model):
                     channel, message,
                     item_id=order_id, reference=order.name)
         except:
-            _logger.error('Cannot send Telegram Message')
+            _logger.error('Cannot send Telegram Message\{}'.format(
+                sys.exc_info()))
 
         # Check approvation flag:
         return self.write(cr, uid, ids, {
