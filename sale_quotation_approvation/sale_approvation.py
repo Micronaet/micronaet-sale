@@ -44,7 +44,28 @@ class SaleOrder(orm.Model):
     """
     _inherit = 'sale.order'
 
-    # todo override confirm action to send message here:
+    # Override confirm action to send message:
+    def action_button_confirm(self, cr, uid, ids, context=None):
+        """ Override to send message here:
+        """
+        # Send message for request confirmation:
+        try:
+            telegram_pool = self.pool.get('telegram.bot')
+            channel = telegram_pool.get_channel_with_code(
+                cr, uid, 'QUOTATION', context=context)
+
+            order_id = ids[0]
+            order = self.browse(cr, uid, order_id, context=context)
+            message = 'Ordine confermato:'
+            if channel:
+                telegram_pool.send_message(
+                    channel, message,
+                    item_id=order_id, reference=order.name)
+        except:
+            _logger.error('Cannot send Telegram Message')
+
+        super(SaleOrder, self).action_button_confirm(
+            cr, uid, ids, context=context)
 
     def action_button_request_approve(self, cr, uid, ids, context=None):
         """ Set order for request confirmation
