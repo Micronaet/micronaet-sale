@@ -44,6 +44,8 @@ class SaleOrder(orm.Model):
     """
     _inherit = 'sale.order'
 
+    # todo override confirm action to send message here:
+
     def action_button_request_approve(self, cr, uid, ids, context=None):
         """ Set order for request confirmation
         """
