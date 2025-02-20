@@ -65,6 +65,13 @@ class SaleOrder(orm.Model):
             _logger.error('Cannot send Telegram Message\{}'.format(
                 sys.exc_info()))
 
+    def action_button_request_approve_deny(self, cr, uid, ids, context=None):
+        """ Deny approvation
+        """
+        return self.write(cr, uid, ids, {
+            'request_approvation': False,  # Restored flag (hide deny button)
+        }, context=context)
+
     # Override confirm action to send message:
     def action_button_confirm(self, cr, uid, ids, context=None):
         """ Override to send message here:
@@ -73,10 +80,14 @@ class SaleOrder(orm.Model):
         res = super(SaleOrder, self).action_button_confirm(
             cr, uid, ids, context=context)
 
+        # Send Message
         self.send_telegram_approvation_message(
             cr, uid, ids,
             message='Ordine confermato (da inviare):',
             context=context)
+
+        # Restore flag:
+        self.action_button_request_approve_deny(cr, uid, ids, context=context)
 
         return res
 
