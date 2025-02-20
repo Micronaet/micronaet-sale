@@ -44,7 +44,8 @@ class SaleOrder(orm.Model):
     """
     _inherit = 'sale.order'
 
-    def send_telegram_approvation_message(self, cr, uid, message, context=None):
+    def send_telegram_approvation_message(
+            self, cr, uid, ids, message, context=None):
         """ Sent telegram message
         """
         channel_pool = self.pool.get('telegram.bot.channel')
