@@ -75,15 +75,15 @@ class SaleOrder(orm.Model):
         """
         # Send message for request confirmation:
         try:
-            telegram_pool = self.pool.get('telegram.bot')
-            channel = telegram_pool.get_channel_with_code(
+            channel_pool = self.pool.get('telegram.bot.channel')
+            channel = channel_pool.get_channel_with_code(
                 cr, uid, 'QUOTATION', context=context)
 
             order_id = ids[0]
             order = self.browse(cr, uid, order_id, context=context)
             message = 'Richiesta approvazione ordine:'
             if channel:
-                telegram_pool.send_message(
+                channel_pool.send_message(
                     channel, message,
                     item_id=order_id, reference=order.name)
         except:
