@@ -44,44 +44,18 @@ class SaleOrder(orm.Model):
     """
     _inherit = 'sale.order'
 
-    # Override confirm action to send message:
-    def action_button_confirm(self, cr, uid, ids, context=None):
-        """ Override to send message here:
+    def send_telegram_approvation_message(self, cr, uid, message, context=None):
+        """ Sent telegram message
         """
-        # Regular inherited action:
-        res = super(SaleOrder, self).action_button_confirm(
-            cr, uid, ids, context=context)
+        channel_pool = self.pool.get('telegram.bot.channel')
 
         # Send message for request confirmation:
         try:
-            telegram_pool = self.pool.get('telegram.bot')
-            channel = telegram_pool.get_channel_with_code(
-                cr, uid, 'QUOTATION', context=context)
-
-            order_id = ids[0]
-            order = self.browse(cr, uid, order_id, context=context)
-            message = 'Ordine confermato:'
-            if channel:
-                telegram_pool.send_message(
-                    channel, message,
-                    item_id=order_id, reference=order.name)
-        except:
-            _logger.error('Cannot send Telegram Message\{}'.format(
-                sys.exc_info()))
-        return res
-
-    def action_button_request_approve(self, cr, uid, ids, context=None):
-        """ Set order for request confirmation
-        """
-        # Send message for request confirmation:
-        try:
-            channel_pool = self.pool.get('telegram.bot.channel')
             channel = channel_pool.get_channel_with_code(
                 cr, uid, 'QUOTATION', context=context)
 
             order_id = ids[0]
             order = self.browse(cr, uid, order_id, context=context)
-            message = 'Richiesta approvazione ordine:'
             if channel:
                 channel_pool.send_message(
                     channel, message,
@@ -90,7 +64,30 @@ class SaleOrder(orm.Model):
             _logger.error('Cannot send Telegram Message\{}'.format(
                 sys.exc_info()))
 
-        # Check approvation flag:
+    # Override confirm action to send message:
+    def action_button_confirm(self, cr, uid, ids, context=None):
+        """ Override to send message here:
+        """
+        # Regular inherited action:
+        res = super(SaleOrder, self).action_button_confirm(
+            cr, uid, ids, context=context)
+
+        self.send_telegram_approvation_message(
+            cr, uid, ids,
+            message='Ordine confermato (da inviare):',
+            context=context)
+
+        return res
+
+    def action_button_request_approve(self, cr, uid, ids, context=None):
+        """ Set order for request confirmation
+        """
+        self.send_telegram_approvation_message(
+            cr, uid, ids,
+            message='Richiesta approvazione ordine:',
+            context=context)
+
+        # Check flag:
         return self.write(cr, uid, ids, {
             'request_approvation': True,
         }, context=context)
