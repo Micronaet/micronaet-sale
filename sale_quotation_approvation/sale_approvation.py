@@ -47,7 +47,10 @@ class SaleOrder(orm.Model):
     def scheduled_sent_approve_order_list(self, cr, uid, context=None):
         """ Return list of order pending
         """
-        order_ids = self.search(cr, uid, [], context=context)
+        order_ids = self.search(cr, uid, [
+            ('request_approvation', '=', True),
+        ], context=context)
+
         for order_id in order_ids:
             self.send_telegram_approvation_message(
                 cr, uid, [order_id],
