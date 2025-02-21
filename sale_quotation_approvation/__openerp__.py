@@ -37,6 +37,7 @@
     'data': [
         'security/approvation_group.xml',
         'approvation_view.xml',
+        'scheduler.xml',
         ],
     'active': False,
     'installable': True,

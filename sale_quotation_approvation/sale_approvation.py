@@ -44,6 +44,17 @@ class SaleOrder(orm.Model):
     """
     _inherit = 'sale.order'
 
+    def scheduled_sent_approve_order_list(self, cr, uid, context=None):
+        """ Return list of order pending
+        """
+        order_ids = self.search(cr, uid, [], context=context)
+        for order_id in order_ids:
+            self.send_telegram_approvation_message(
+                cr, uid, [order_id],
+                message='Richiesta approvazione ordine:',
+                context=context)
+        return True
+
     def send_telegram_approvation_message(
             self, cr, uid, ids, message, context=None):
         """ Sent telegram message
@@ -86,26 +97,29 @@ class SaleOrder(orm.Model):
         res = super(SaleOrder, self).action_button_confirm(
             cr, uid, ids, context=context)
 
-        # Send Message
-        self.send_telegram_approvation_message(
-            cr, uid, ids,
-            message='Ordine confermato (da inviare):',
-            context=context)
+        # Send Message (only if request approve)
+        order = self.browse(cr, uid, ids, context=context)[0]
+        if order.request_approvation:
+            self.send_telegram_approvation_message(
+                cr, uid, ids,
+                message='Ordine confermato (da inviare):',
+                context=context)
 
-        # Restore flag:
-        return self.write(cr, uid, ids, {
-            'request_approvation': False,  # Restored flag (hide deny button)
-        }, context=context)
+            # Restore flag:
+            self.write(cr, uid, ids, {
+                'request_approvation': False,  # Restored flag (hide deny button)
+            }, context=context)
 
         return res
 
     def action_button_request_approve(self, cr, uid, ids, context=None):
         """ Set order for request confirmation
         """
-        self.send_telegram_approvation_message(
-            cr, uid, ids,
-            message='Richiesta approvazione ordine:',
-            context=context)
+        # Send only daily:
+        # self.send_telegram_approvation_message(
+        #    cr, uid, ids,
+        #    message='Richiesta approvazione ordine:',
+        #    context=context)
 
         # Check flag:
         return self.write(cr, uid, ids, {
