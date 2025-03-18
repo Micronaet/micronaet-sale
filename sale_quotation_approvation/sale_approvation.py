@@ -96,6 +96,17 @@ class SaleOrder(orm.Model):
     def action_button_confirm(self, cr, uid, ids, context=None):
         """ Override to send message here:
         """
+        def clean_ascii(value):
+            """ Remove not ascii char
+            """
+            res = ''
+            for c in value:
+                if ord(c) < 127:
+                    res += c
+                else:
+                    res += '?'
+            return res
+
         # Regular inherited action:
         res = super(SaleOrder, self).action_button_confirm(
             cr, uid, ids, context=context)
@@ -103,9 +114,15 @@ class SaleOrder(orm.Model):
         # Send Message (only if request approve)
         order = self.browse(cr, uid, ids, context=context)[0]
         if order.request_approvation:
+            partner = clean_ascii(order.partner_id.name or '')
+            amount = order.amount_total
             self.send_telegram_approvation_message(
                 cr, uid, ids,
-                message='Ordine confermato (da inviare):',
+                message='Ordine confermato (da inviare)\n'
+                        'Cliente{}\n'
+                        'Importo: {}\n'.format(
+                    partner, amount,
+                ),
                 context=context)
 
             # Restore flag:
