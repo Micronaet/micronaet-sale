@@ -52,9 +52,15 @@ class SaleOrder(orm.Model):
         ], context=context)
 
         for order_id in order_ids:
+            partner = clean_ascii(order.partner_id.name or '')
+            amount = order.amount_total
             self.send_telegram_approvation_message(
                 cr, uid, [order_id],
-                message='Richiesta approvazione ordine:',
+                message='Richiesta approvazione ordine\n'
+                        'Cliente{}\n'
+                        'Importo: {}\n'.format(
+                    partner, amount,
+                ),
                 context=context)
         return True
 
