@@ -70,8 +70,8 @@ class SaleOrder(orm.Model):
             self.send_telegram_approvation_message(
                 cr, uid, [order_id],
                 message='Richiesta approvazione ordine\n'
-                        'Cliente{}\n'
-                        'Importo: {}\n'.format(
+                        'Cliente: {}\n'
+                        'Importo: {}'.format(
                     partner, amount,
                 ),
                 context=context)
@@ -128,8 +128,8 @@ class SaleOrder(orm.Model):
             self.send_telegram_approvation_message(
                 cr, uid, ids,
                 message='Ordine confermato (da inviare)\n'
-                        'Cliente{}\n'
-                        'Importo: {}\n'.format(
+                        'Cliente: {}\n'
+                        'Importo: {}'.format(
                     partner, amount,
                 ),
                 context=context)
