@@ -63,7 +63,8 @@ class SaleOrder(orm.Model):
             ('request_approvation', '=', True),
         ], context=context)
 
-        for order_id in order_ids:
+        for order in self.browse(cr, uid, order_ids, context=context):
+            order_id = order.id
             partner = clean_ascii(order.partner_id.name or '')
             amount = order.amount_total
             self.send_telegram_approvation_message(
