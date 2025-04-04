@@ -61,20 +61,26 @@ class SaleOrder(orm.Model):
         """
         order_ids = self.search(cr, uid, [
             ('request_approvation', '=', True),
+            ('request_approvation_sent', '=', False),
         ], context=context)
 
         for order in self.browse(cr, uid, order_ids, context=context):
             order_id = order.id
             partner = clean_ascii(order.partner_id.name or '')
             amount = order.amount_total
-            self.send_telegram_approvation_message(
-                cr, uid, [order_id],
-                message='Richiesta approvazione ordine\n'
-                        'Cliente: {}\n'
-                        'Importo: {}'.format(
-                    partner, amount,
-                ),
-                context=context)
+            if self.send_telegram_approvation_message(
+                    cr, uid, [order_id],
+                    message='Richiesta approvazione ordine\nCliente: {}\nImporto: {}'.format(partner, amount),
+                    context=context):
+
+                # Update order with chatter and remove new sent
+                self.write(cr, uid, [order.id], {
+                    'request_approvation_sent': True,
+                    }, context=context)
+                self.message_post(
+                    cr, uid, [order.id],
+                    body='Richiesta approvazione inviata via Telegram',
+                    context=context)
         return True
 
     def send_telegram_approvation_message(
@@ -95,8 +101,9 @@ class SaleOrder(orm.Model):
                     channel, message,
                     item_id=order_id, reference=order.name)
         except:
-            _logger.error('Cannot send Telegram Message\{}'.format(
-                sys.exc_info()))
+            _logger.error('Cannot send Telegram Message\{}'.format(sys.exc_info()))
+            return False
+        return True
 
     def action_button_request_approve_deny(self, cr, uid, ids, context=None):
         """ Deny approvation
@@ -117,44 +124,35 @@ class SaleOrder(orm.Model):
         """
 
         # Regular inherited action:
-        res = super(SaleOrder, self).action_button_confirm(
-            cr, uid, ids, context=context)
+        res = super(SaleOrder, self).action_button_confirm(cr, uid, ids, context=context)
 
         # Send Message (only if request approve)
         order = self.browse(cr, uid, ids, context=context)[0]
         if order.request_approvation:
             partner = clean_ascii(order.partner_id.name or '')
             amount = order.amount_total
-            self.send_telegram_approvation_message(
-                cr, uid, ids,
-                message='Ordine confermato (da inviare)\n'
-                        'Cliente: {}\n'
-                        'Importo: {}'.format(
-                    partner, amount,
-                ),
-                context=context)
-
-            # Restore flag:
-            self.write(cr, uid, ids, {
-                'request_approvation': False,  # Restored flag (hide deny button)
-            }, context=context)
+            if self.send_telegram_approvation_message(
+                    cr, uid, ids,
+                    message='Ordine confermato (da inviare)\nCliente: {}\nImporto: {}'.format(partner, amount),
+                    context=context):
+                # Restore flag:
+                self.write(cr, uid, ids, {
+                    'request_approvation': False,  # Restored flag (hide deny button)
+                    'request_approvation_sent': False,
+                }, context=context)
 
         return res
 
     def action_button_request_approve(self, cr, uid, ids, context=None):
         """ Set order for request confirmation
         """
-        # Send only daily:
-        # self.send_telegram_approvation_message(
-        #    cr, uid, ids,
-        #    message='Richiesta approvazione ordine:',
-        #    context=context)
-
         # Check flag:
         return self.write(cr, uid, ids, {
             'request_approvation': True,
+            'request_approvation_sent': False,
         }, context=context)
 
     _columns = {
         'request_approvation': fields.boolean('Richiesta approvazione'),
+        'request_approvation_sent': fields.boolean('Richiesta approvazione inviata'),
         }
