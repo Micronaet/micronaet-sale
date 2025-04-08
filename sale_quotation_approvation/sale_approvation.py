@@ -59,6 +59,9 @@ class SaleOrder(orm.Model):
     def scheduled_sent_approve_order_list(self, cr, uid, context=None):
         """ Return list of order pending
         """
+        user = user_pool.browse(cr, uid, uid, context=context)
+        company_name = user.company_id.name
+
         order_ids = self.search(cr, uid, [
             ('request_approvation', '=', True),
             ('request_approvation_sent', '=', False),
@@ -70,7 +73,8 @@ class SaleOrder(orm.Model):
             amount = order.amount_total
             if self.send_telegram_approvation_message(
                     cr, uid, [order_id],
-                    message='Richiesta approvazione ordine\nCliente: {}\nImporto: {}'.format(partner, amount),
+                    message='[{}] Richiesta approvazione ordine\nCliente: {}\nImporto: {}'.format(
+                        company_name, partner, amount),
                     context=context):
 
                 # Update order with chatter and remove new sent
