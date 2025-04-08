@@ -59,6 +59,7 @@ class SaleOrder(orm.Model):
     def scheduled_sent_approve_order_list(self, cr, uid, context=None):
         """ Return list of order pending
         """
+        user_pool = self.pool.get('res.users')
         user = user_pool.browse(cr, uid, uid, context=context)
         company_name = user.company_id.name
 
