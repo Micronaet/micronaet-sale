@@ -82,7 +82,7 @@ class SaleOrder(orm.Model):
 
             partner_id = partner.id
             partner_name = clean_ascii_name(partner)
-            partner_payment = clean_ascii_name(partner.property_payment_term)
+            order_payment = clean_ascii_name(order.payment_term)
             partner_agent = clean_ascii_name(partner.agent_id)
 
             # ----------------------------------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ class SaleOrder(orm.Model):
                 'FIDO: Tot. {} Scop. {} ({})\n'
                 'Importo: {}'.format(
                     company_name,
-                    partner_name, partner_payment, partner_agent,
+                    partner_name, order_payment, partner_agent,
                     partner_reference,
                     '\nDestinazione: {}'.format(destination_reference) if destination_reference else '',
                     order_number, amount_total,
