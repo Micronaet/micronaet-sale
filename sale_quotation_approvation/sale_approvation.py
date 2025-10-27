@@ -245,6 +245,12 @@ class SaleOrder(orm.Model):
     def action_button_confirm(self, cr, uid, ids, context=None):
         """ Override to send message here:
         """
+        user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
+        try:
+            manager_user = user.has_group('sale_quotation_approvation.group_sale_order_approvation_manager')
+            _logger.warning('User is a manager, order is confirmed and saw!')
+        except:
+            manager_user = True  # todo remove this management try / except
 
         # Regular inherited action:
         res = super(SaleOrder, self).action_button_confirm(cr, uid, ids, context=context)
@@ -258,12 +264,17 @@ class SaleOrder(orm.Model):
                     cr, uid, ids,
                     message='Ordine confermato (da inviare)\nCliente: {}\nImporto: {}'.format(partner, amount),
                     context=context):
-                # Restore flag:
-                self.write(cr, uid, ids, {
-                    'request_approvation': False,  # Restored flag (hide deny button)
-                    'request_approvation_sent': False,
-                }, context=context)
 
+                # Restore flag:
+                data = {
+                    'request_approvation_sent': False,
+                }
+                if manager_user:  # Also Saw flag:
+                    data.update({
+                        'request_approvation': False,  # Restored flag (hide deny button)
+                    })
+
+                self.write(cr, uid, ids, data, context=context)
         return res
 
     def action_button_request_approve(self, cr, uid, ids, context=None):

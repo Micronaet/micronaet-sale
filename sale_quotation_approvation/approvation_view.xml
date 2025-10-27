@@ -32,6 +32,19 @@
                 </xpath>
             </field>
         </record>
+        <record model="ir.ui.view" id="view_order_saw_buttontree">
+            <field name="name">Visto</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="	sale.view_order_tree" />
+            <field name="arch" type="xml">
+                <field name="state" position="after">
+                    <field name="request_approvation" invisible="1"/>
+                    <button name="set_request_approvation_true" string="Visto!" invisible="not context.get('saw_mode')"
+                            attrs="{'invisible': [('request_approvation', '=', False)]}" groups="sale_quotation_approvation.group_sale_order_approvation_manager"
+                            icon="gtk-ok" type="object" />
+                </field>
+            </field>
+        </record>
 
         <record model="ir.ui.view" id="view_sale_order_approve_button_form_view">
             <field name="name">Approve button</field>
@@ -45,7 +58,7 @@
                         attrs="{'invisible': ['|', ('request_approvation', '=', True), ('state', 'not in', ('draft', 'sent'))]}"/>
                     <button name="action_button_request_approve_deny" string="Non approvato"
                         type="object" icon="gtk-no"
-                        attrs="{'invisible': [('request_approvation', '=', False)]}"/>
+                        attrs="{'invisible': [('request_approvation', '=', False)]}"/> <!-- if approved mode 2 change setup for confirmed order -->
                     <field name="request_approvation" invisible="1"/>
                 </button>
             </field>
@@ -57,11 +70,22 @@
             <field name="view_mode">tree,form</field>
             <field name="domain">[('state', 'in', ('draft', 'sent')), ('request_approvation', '=', True)]</field>
         </record>
+        <record id="sale_order_saw_action" model="ir.actions.act_window">
+            <field name="name">Richiesta vistatura</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'saw_mode': True}</field>
+            <field name="domain">[('state', 'not in', ('draft', 'sent', 'cancel')), ('request_approvation', '=', True)]</field>
+        </record>
 
         <!-- This Menu Item must have a parent and an action -->
         <menuitem id="menu_sale_order_approve"
+              groups="sale_quotation_approvation.group_sale_order_approvation_manager,sale_quotation_approvation.group_sale_order_approvation_user"
+              name="Offerte da approvare" parent="base.menu_sales" action="sale_order_approve_action" sequence="5"/>
+        <menuitem id="menu_sale_order_saw"
               groups="sale_quotation_approvation.group_sale_order_approvation_manager"
-              name="Ordini da approvare" parent="base.menu_sales" action="sale_order_approve_action" sequence="5"/>
+              name="Ordini da vistare" parent="base.menu_sales" action="sale_order_saw_action" sequence="5"/>
     </data>
 </openerp>
 
