@@ -43,13 +43,20 @@ def clean_ascii(value):
     """ Remove not ascii char
     """
     res = ''
-    for c in value:
+    for c in (value or ''):
         if ord(c) < 127:
             res += c
         else:
             res += '?'
     return res
 
+def clean_ascii_name(object):
+    """ Return name of linked object
+    """
+    name = object.name or ''
+    if not name:
+        return name
+    return clean_ascii(name)
 
 class SaleOrder(orm.Model):
     """ Model name: SaleOrder
@@ -70,14 +77,74 @@ class SaleOrder(orm.Model):
 
         for order in self.browse(cr, uid, order_ids, context=context):
             order_id = order.id
-            partner = clean_ascii(order.partner_id.name or '')
-            amount = order.amount_total
-            if self.send_telegram_approvation_message(
-                    cr, uid, [order_id],
-                    message='[{}] Richiesta approvazione ordine\nCliente: {}\nImporto: {}'.format(
-                        company_name, partner, amount),
-                    context=context):
+            partner = order.partner_id
+            destination = order.destination_partner_id
 
+            partner_name = clean_ascii_name(partner)
+            partner_payment = clean_ascii_name(partner.property_payment_term)
+            partner_agent = clean_ascii_name(partner.agent_id)
+
+            # ----------------------------------------------------------------------------------------------------------
+            # Order of this partner:
+            # ----------------------------------------------------------------------------------------------------------
+            total_order_ids = self.search(cr, uid, [
+                # ('id', '!=', order_id),  # Esclude this!
+                ('partner_id', '=', partner_id),
+                ('mx_closed', '=', False),
+                ('state', 'not in', ('draft', 'sent', 'cancel')),
+            ])
+            order_number = len(total_order_ids)
+            amount_total = sum([o.amount_total for o in self.browse(cr, uid, total_order_ids, context=context)])
+
+            # ----------------------------------------------------------------------------------------------------------
+            # FIDO:
+            # ----------------------------------------------------------------------------------------------------------
+            fido_total = partner.fido_total
+            fido_uncovered = partner.uncovered_amount
+            fido_date = partner.fido_date
+            # uncovered_state (colors)
+            # fido_ko (rimosso)
+
+            # ----------------------------------------------------------------------------------------------------------
+            # Partner:
+            # ----------------------------------------------------------------------------------------------------------
+            partner_reference = '{} ({}) - {}'.format(
+                clean_ascii(partner.city),
+                clean_ascii_name(partner.state_id),
+                clean_ascii_name(partner.country_id),
+            )
+
+            if destination:
+                destination_reference = '{} ({}) - {}'.format(
+                    clean_ascii(destination.city),
+                    clean_ascii_name(destination.state_id),
+                    clean_ascii_name(destination.country_id),
+                )
+            else:
+                destination_reference = ''
+            amount = order.amount_total
+
+            # ----------------------------------------------------------------------------------------------------------
+            # Send Telegram Message:
+            # ----------------------------------------------------------------------------------------------------------
+            message = (
+                '[{}] Richiesta approvazione ordine\n'
+                'Cliente: {}\nPagamento: {}\nAgente: {}\n' 
+                'Indirizzo: {}'
+                '{}'
+                'Ordini totali: # {} Tot. {}\n'
+                'FIDO: Tot. {} Scop. {} ({})\n'
+                'Importo: {}'.format(
+                    company_name,
+                    partner_name, partner_payment, partner_agent,
+                    partner_reference,
+                    '\nDestinazione: {}'.format(destination_reference) if destination_reference else '',
+                    order_number, amount_total,
+                    fido_total, fido_uncovered, fido_date,
+                    amount,
+                    ))
+
+            if self.send_telegram_approvation_message(cr, uid, [order_id], message=message,  context=context):
                 # Update order with chatter and remove new sent
                 self.write(cr, uid, [order.id], {
                     'request_approvation_sent': True,
