@@ -67,6 +67,54 @@ class SaleOrder(orm.Model):
     """
     _inherit = 'sale.order'
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Wizard emulation:
+    # ------------------------------------------------------------------------------------------------------------------
+    def action_button_send_message_telegram_note(self, cr, uid, ids, context=None):
+        """ Send message action
+        """
+        telegram_message = self.browse(cr, uid, ids, context=context)[0].telegram_message
+
+        # Chatter message:
+        self.message_post(cr, uid, ids, body=telegram_message, context=context)
+
+        # Telegram Message:
+        self.send_telegram_approvation_message(cr, uid, ids, message=telegram_message,  context=context)
+
+        return True
+
+    def action_button_add_telegram_note(self, cr, uid, ids, context=None):
+        """ Open pop up to send Telegram Message
+        """
+        assert len(ids) == 1, 'Solo un ordine per volta!'
+        order_id = ids[0]
+
+        # Clean previous Text Message:
+        self.write(cr, uid, ids, {
+            'telegram_message': False,
+        }, context=context)
+
+        # Open pop up window for Text message
+        model_pool = self.pool.get('ir.model.data')
+        view_id = model_pool.get_object_reference(
+            cr, uid, 'sale_quotation_approvation', 'view_sale_order_telegram_message_form_view')[1]
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Messaggio Telegram'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_id': order_id,
+            'res_model': 'sale.order',
+            'view_id': view_id,
+            'views': [(view_id, 'form')],
+            'domain': [],
+            'context': context,
+            'target': 'new',
+            'nodestroy': False,
+            }
+    # ------------------------------------------------------------------------------------------------------------------
+
     def scheduled_sent_approve_order_list(self, cr, uid, context=None):
         """ Return list of order pending
         """
@@ -161,23 +209,19 @@ class SaleOrder(orm.Model):
                     context=context)
         return True
 
-    def send_telegram_approvation_message(
-            self, cr, uid, ids, message, context=None):
+    def send_telegram_approvation_message(self, cr, uid, ids, message, context=None):
         """ Sent telegram message
         """
         channel_pool = self.pool.get('telegram.bot.channel')
 
         # Send message for request confirmation:
         try:
-            channel = channel_pool.get_channel_with_code(
-                cr, uid, 'QUOTATION', context=context)
+            channel = channel_pool.get_channel_with_code(cr, uid, 'QUOTATION', context=context)
 
             order_id = ids[0]
             order = self.browse(cr, uid, order_id, context=context)
             if channel:
-                channel_pool.send_message(
-                    channel, message,
-                    item_id=order_id, reference=order.name)
+                channel_pool.send_message(channel, message, item_id=order_id, reference=order.name)
         except:
             _logger.error('Cannot send Telegram Message\{}'.format(sys.exc_info()))
             return False
@@ -231,6 +275,9 @@ class SaleOrder(orm.Model):
         }, context=context)
 
     _columns = {
+        'telegram_message': fields.text(
+            'Telegram Message',
+            help='Messaggio temporaneo per inserire un messaggio di Telegram e una nota all\'interno dell\'ordine'),
         'request_approvation': fields.boolean('Richiesta approvazione'),
         'request_approvation_sent': fields.boolean('Richiesta approvazione inviata'),
         }

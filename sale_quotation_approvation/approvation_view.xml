@@ -1,12 +1,30 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
+        <record model="ir.ui.view" id="view_sale_order_telegram_message_form_view">
+            <field name="name">Messaggio Telegram</field>
+            <field name="model">sale.order</field>
+            <field name="priority" eval="40"/>
+            <field name="arch" type="xml">
+                <form string="Messaggio Telegram" version="7.0">
+                    <group col="4" colspan="4">
+                        <separator string="Messaggio di Telegram" colspan="4"/>
+                        <field name="telegram_message" colpan="4" nolabel="1" />
+                    </group>
+                    <footer>
+                        <button name="action_button_send_message_telegram_note" string="Invia messaggio" type="object" icon="gtk-index" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
         <record model="ir.ui.view" id="view_sale_order_approve_button_form_view">
             <field name="name">Approve button</field>
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form" />
             <field name="arch" type="xml">
                 <button name="action_button_confirm" position="before">
+                    <button name="action_button_add_telegram_note" string="Nota Telegram" type="object" icon="gtk-index" />
                     <button name="action_button_request_approve" string="Richiesta approvazione"
                         type="object" icon="gtk-help"
                         attrs="{'invisible': ['|', ('request_approvation', '=', True), ('state', 'not in', ('draft', 'sent'))]}"/>
@@ -24,6 +42,7 @@
             <field name="view_mode">tree,form</field>
             <field name="domain">[('state', 'in', ('draft', 'sent')), ('request_approvation', '=', True)]</field>
         </record>
+
         <!-- This Menu Item must have a parent and an action -->
         <menuitem id="menu_sale_order_approve"
               groups="sale_quotation_approvation.group_sale_order_approvation_manager"
