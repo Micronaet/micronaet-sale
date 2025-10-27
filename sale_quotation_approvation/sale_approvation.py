@@ -80,6 +80,7 @@ class SaleOrder(orm.Model):
             partner = order.partner_id
             destination = order.destination_partner_id
 
+            partner_id = partner.id
             partner_name = clean_ascii_name(partner)
             partner_payment = clean_ascii_name(partner.property_payment_term)
             partner_agent = clean_ascii_name(partner.agent_id)
