@@ -117,7 +117,7 @@ class SaleOrder(orm.Model):
 
             if destination:
                 destination_reference = '{} - {} ({}) - {}'.format(
-                    clean_ascii_name(destination),
+                    clean_ascii(destination.name),
                     clean_ascii(destination.city),
                     clean_ascii_name(destination.state_id),
                     clean_ascii_name(destination.country_id),
