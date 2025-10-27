@@ -241,6 +241,17 @@ class SaleOrder(orm.Model):
             'request_approvation': False,  # Restored flag (hide deny button)
         }, context=context)
 
+    def set_request_approvation_true(self, cr, uid, ids, context=None):
+        """ Saw confirmed order
+        """
+        message = 'Conferma visione amministratore (ordine approvato da un operatore)'
+        self.message_post(cr, uid, ids, body=message, context=context)
+
+        return self.write(cr, uid, ids, {
+            'request_approvation': False,  # Restored flag (hide deny button)
+            'request_approvation_sent': False,
+        }, context=context)
+
     # Override confirm action to send message:
     def action_button_confirm(self, cr, uid, ids, context=None):
         """ Override to send message here:
