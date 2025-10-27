@@ -37,11 +37,11 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_tree" />
             <field name="arch" type="xml">
-                <field name="state" position="after">
+                <field name="name" position="after">
                     <field name="request_approvation" invisible="1"/>
                     <button name="set_request_approvation_true" string="Visto!" invisible="not context.get('saw_mode')"
                             attrs="{'invisible': [('request_approvation', '=', False)]}" groups="sale_quotation_approvation.group_sale_order_approvation_manager"
-                            icon="gtk-ok" type="object" />
+                            icon="gtk-apply" type="object" />
                 </field>
             </field>
         </record>
