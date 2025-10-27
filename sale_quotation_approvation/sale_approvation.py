@@ -116,7 +116,8 @@ class SaleOrder(orm.Model):
             )
 
             if destination:
-                destination_reference = '{} ({}) - {}'.format(
+                destination_reference = '{} - {} ({}) - {}'.format(
+                    clean_ascii_name(destination),
                     clean_ascii(destination.city),
                     clean_ascii_name(destination.state_id),
                     clean_ascii_name(destination.country_id),
@@ -134,7 +135,7 @@ class SaleOrder(orm.Model):
                 'Indirizzo: {}'
                 '{}\n'
                 'Ordini totali: # {} Tot. {}\n'
-                'FIDO: Tot. {} Scop. {} ({})\n'
+                'FIDO: Tot. {} Dispon. {} ({})\n'
                 'Importo: {}'.format(
                     company_name,
                     partner_name, order_payment, partner_agent,
