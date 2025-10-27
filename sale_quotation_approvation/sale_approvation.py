@@ -42,8 +42,12 @@ _logger = logging.getLogger(__name__)
 def clean_ascii(value):
     """ Remove not ascii char
     """
+    unused = ('*', '/')
     res = ''
     for c in (value or ''):
+        if c in unused:
+            # Jump unwanted char
+            continue
         if ord(c) < 127:
             res += c
         else:
