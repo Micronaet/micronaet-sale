@@ -276,6 +276,9 @@ class SaleOrder(orm.Model):
         }, context=context)
 
     _columns = {
+        'extra_discount_detail': fields.text(
+            'Dettagli extra sconti',
+            help='Indicare qui il motivo di applicazionie di particolari sconti extra nella offerta / ordine'),
         'telegram_message': fields.text(
             'Telegram Message',
             help='Messaggio temporaneo per inserire un messaggio di Telegram e una nota all\'interno dell\'ordine'),

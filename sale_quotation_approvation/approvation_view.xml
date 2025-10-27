@@ -17,6 +17,21 @@
                 </form>
             </field>
         </record>
+        <record model="ir.ui.view" id="view_sale_order_extra_discount_note_form_view">
+            <field name="name">Note extra sconto</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page name="extra_discount_page" string="Extra sconti">
+                        <group col="4" colspan="4">
+                            <separator string="Note sconti extra:" colspan="4" />
+                            <field name="extra_discount_detail" nolabel="1" colpan="4"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
 
         <record model="ir.ui.view" id="view_sale_order_approve_button_form_view">
             <field name="name">Approve button</field>
