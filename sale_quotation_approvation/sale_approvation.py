@@ -88,8 +88,8 @@ class SaleOrder(orm.Model):
             # ----------------------------------------------------------------------------------------------------------
             # Order of this partner:
             # ----------------------------------------------------------------------------------------------------------
+            # Note: Current sale.order is not approved yet!
             total_order_ids = self.search(cr, uid, [
-                # ('id', '!=', order_id),  # Esclude this!
                 ('partner_id', '=', partner_id),
                 ('mx_closed', '=', False),
                 ('state', 'not in', ('draft', 'sent', 'cancel')),
@@ -100,9 +100,9 @@ class SaleOrder(orm.Model):
             # ----------------------------------------------------------------------------------------------------------
             # FIDO:
             # ----------------------------------------------------------------------------------------------------------
-            fido_total = partner.fido_total
-            fido_uncovered = partner.uncovered_amount
-            fido_date = partner.fido_date
+            fido_total = partner.fido_total or 0
+            fido_uncovered = partner.uncovered_amount or 0
+            fido_date = partner.fido_date or '/'
             # uncovered_state (colors)
             # fido_ko (rimosso)
 
@@ -132,7 +132,7 @@ class SaleOrder(orm.Model):
                 '[{}] Richiesta approvazione ordine\n'
                 'Cliente: {}\nPagamento: {}\nAgente: {}\n' 
                 'Indirizzo: {}'
-                '{}'
+                '{}\n'
                 'Ordini totali: # {} Tot. {}\n'
                 'FIDO: Tot. {} Scop. {} ({})\n'
                 'Importo: {}'.format(
