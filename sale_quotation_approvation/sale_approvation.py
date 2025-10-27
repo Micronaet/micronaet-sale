@@ -79,6 +79,7 @@ class SaleOrder(orm.Model):
         self.message_post(cr, uid, ids, body=telegram_message, context=context)
 
         # Telegram Message:
+        telegram_message = clean_ascii(telegram_message)
         self.send_telegram_approvation_message(cr, uid, ids, message=telegram_message,  context=context)
 
         return True
