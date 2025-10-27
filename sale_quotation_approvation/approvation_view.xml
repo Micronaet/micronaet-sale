@@ -35,7 +35,7 @@
         <record model="ir.ui.view" id="view_order_saw_buttontree">
             <field name="name">Visto</field>
             <field name="model">sale.order</field>
-            <field name="inherit_id" ref="	sale.view_order_tree" />
+            <field name="inherit_id" ref="sale.view_order_tree" />
             <field name="arch" type="xml">
                 <field name="state" position="after">
                     <field name="request_approvation" invisible="1"/>
