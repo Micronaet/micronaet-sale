@@ -301,26 +301,25 @@ class SaleOrder(orm.Model):
     def get_approvation_detail(self, cr, uid, ids, fields, args, context=None):
         """ Extract partner info
         """
-        self.ensure_one()
         res = {}
-        order = self.browse(cr, uid, ids, context=context)[0]
-        partner = order.partner_id
-        res[order.id] = '{}\n{} {} {}\nAgente: {}\nPag.: {}\nFIDO{}: {} Sc. {} ({})'.format(
-            partner.name,
+        for order in self.browse(cr, uid, ids, context=context):
+            partner = order.partner_id
+            res[order.id] = '{}\n{} {} {}\nAgente: {}\nPag.: {}\nFIDO{}: {} Sc. {} ({})'.format(
+                partner.name,
 
-            partner.street,
-            partner.city,
-            partner.country_id.name or '/',
+                partner.street,
+                partner.city,
+                partner.country_id.name or '/',
 
-            partner.agent_id.name if partner.agent_id else '/',
+                partner.agent_id.name if partner.agent_id else '/',
 
-            partner.property_payment_term.name or '/',
+                partner.property_payment_term.name or '/',
 
-            partner.fido_total,
-            partner.uncovered_amount,
-            partner.fido_date,
-            'KO!' if partner.fido_ko else '',
-        )
+                partner.fido_total,
+                partner.uncovered_amount,
+                partner.fido_date,
+                'KO!' if partner.fido_ko else '',
+            )
         return res
 
     _columns = {
