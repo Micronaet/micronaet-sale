@@ -304,7 +304,7 @@ class SaleOrder(orm.Model):
         res = {}
         for order in self.browse(cr, uid, ids, context=context):
             partner = order.partner_id
-            res[order.id] = '{}\n{} {} {}\nAgente: {}\nPag.: {}\nFIDO{}: {} Sc. {} ({})'.format(
+            res[order.id] = '{}\n{} {} {}\nAgente: {}\nPagamento: {}\nFIDO{}: {} Sc. {} ({})'.format(
                 partner.name,
 
                 partner.street,
@@ -315,10 +315,10 @@ class SaleOrder(orm.Model):
 
                 partner.property_payment_term.name or '/',
 
-                partner.fido_total,
-                partner.uncovered_amount,
-                partner.fido_date,
                 'KO!' if partner.fido_ko else '',
+                int(partner.fido_total or 0.0),
+                int(partner.uncovered_amount or 0.0),
+                partner.fido_date or '',
             )
         return res
 

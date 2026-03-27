@@ -7,7 +7,7 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form" />
             <field name="arch" type="xml">
-                <field name="partner_id" position="after">
+                <field name="partner_id" position="before">
                     <field name="approvation_detail" groups="sale_quotation_approvation.group_sale_order_approvation_manager"/>
                 </field>
             </field>
