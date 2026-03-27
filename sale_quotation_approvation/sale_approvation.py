@@ -124,6 +124,7 @@ class SaleOrder(orm.Model):
         company_name = user.company_id.name
 
         order_ids = self.search(cr, uid, [
+            # ('state', 'in', ('draft', 'sent', 'cancel')),
             ('request_approvation', '=', True),
             ('request_approvation_sent', '=', False),
         ], context=context)
