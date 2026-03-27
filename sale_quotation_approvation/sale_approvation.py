@@ -298,7 +298,34 @@ class SaleOrder(orm.Model):
             'request_approvation_sent': False,
         }, context=context)
 
+    def get_approvation_detail(self, cr, uid, ids, fields, args, context=None):
+        """ Extract partner info
+        """
+        self.ensure_one()
+        res = {}
+        order = self.browse(cr, uid, ids, context=context)[0]
+        partner = order.partner_id
+        res[order.id] = '{}\n{} {} {}\nAgente: {}\nPag.: {}\nFIDO{}: {} Sc. {} ({})'.format(
+            partner.name,
+
+            partner.street,
+            partner.city,
+            partner.country_id.name or '/',
+
+            partner.agent_id.name if partner.agent_id else '/',
+
+            partner.property_payment_term.name or '/',
+
+            partner.fido_total,
+            partner.uncovered_amount,
+            partner.fido_date,
+            'KO!' if partner.fido_ko else '',
+        )
+        return res
+
     _columns = {
+        'approvation_detail': fields.function(
+            get_approvation_detail, method=True, string='Dettaglio cliente', type='text', readonly=True),
         'extra_discount_detail': fields.text(
             'Dettagli extra sconti',
             help='Indicare qui il motivo di applicazionie di particolari sconti extra nella offerta / ordine'),

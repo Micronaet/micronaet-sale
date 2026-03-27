@@ -1,6 +1,18 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
+
+        <record model="ir.ui.view" id="view_sale_order_partner_detail_form">
+            <field name="name">Dettaglio partner</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form" />
+            <field name="arch" type="xml">
+                <field name="partner_id" position="after">
+                    <field name="approvation_detail" groups="sale_quotation_approvation.group_sale_order_approvation_manager"/>
+                </field>
+            </field>
+        </record>
+
         <record model="ir.ui.view" id="view_sale_order_telegram_message_form_view">
             <field name="name">Messaggio Telegram</field>
             <field name="model">sale.order</field>
