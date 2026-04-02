@@ -304,7 +304,7 @@ class SaleOrder(orm.Model):
         res = {}
         for order in self.browse(cr, uid, ids, context=context):
             partner = order.partner_id
-            res[order.id] = '{}\n{} {} {}\nAgente: {}\nPagamento: {}\nFIDO{}: {} Sc. {} ({})'.format(
+            res[order.id] = u'{}\n{} {} {}\nAgente: {}\nPagamento: {}\nFIDO{}: {} Sc. {} ({})'.format(
                 partner.name,
 
                 partner.street,
