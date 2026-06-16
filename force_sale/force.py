@@ -125,12 +125,13 @@ class SaleOrderLineError(orm.Model):
             product = line.product_id
 
             # Loop (product, qty):
-            if product.dynamic_bom_line_ids:
+            if product.dynamic_bom_line_ids:  # Components:
                 components = [(l.product_id, error_qty * l.product_qty) for l in product.dynamic_bom_line_ids]
-            else:
-                # All other items will be unloaded single
+                _logger.info('Components: {}'.format(components))
+            else:  # All other items will be unloaded single
                 # TODO manage service?
                 components = [(product, error_qty)]
+                _logger.info('Single: {}'.format(components))
 
             for (component, product_uom_qty) in components:
                 # Stock move as unload:
