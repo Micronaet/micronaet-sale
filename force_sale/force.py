@@ -99,7 +99,6 @@ class SaleOrderLineError(orm.Model):
 
         pick_ids = {}  # Picking collected by date
         sl_linked = {}  # Line linked (closed after)
-        pdb.set_trace()
         for line in self.browse(cr, uid, error_ids, context=context):
             error_qty = line.error_qty
             date = line.date
@@ -167,8 +166,10 @@ class SaleOrderLineError(orm.Model):
                 sl_linked[line.id] = sl_id
 
         # Remove linked lines:
+        _logger.warning('Pick IDS {}'.format(pick_ids))
+        pdb.set_trace
         for line_id in sl_linked:
-            self.write(cr, ui, [line], {
+            self.write(cr, uid, [line], {
                 'sl_id': sl_linked[line_id],
             }, context=context)
 
