@@ -76,7 +76,6 @@ class SaleOrderLineError(orm.Model):
         company_proxy = user_pool.browse(cr, uid, uid, context=context).company_id
 
         # Read SL reference:
-        pdb.set_trace()
         sl_type = company_proxy.sl_mrp_lavoration_id
         if not sl_type:
             raise osv.except_osv(
@@ -100,6 +99,7 @@ class SaleOrderLineError(orm.Model):
 
         pick_ids = {}  # Picking collected by date
         sl_linked = {}  # Line linked (closed after)
+        pdb.set_trace()
         for line in self.browse(cr, uid, error_ids, context=context):
             error_qty = line.error_qty
             date = line.date
@@ -108,7 +108,7 @@ class SaleOrderLineError(orm.Model):
                 # Create new pick:
                 pick_ids[force_pick_ref] = pick_pool.create(cr, uid, {
                     # 'production_load_type': mode,
-                    'picking_type_id': picking_type_id,
+                    'picking_type_id': sl_type_id,
                     'state': 'done',
                     'date': date,
                     'min_date': date,
