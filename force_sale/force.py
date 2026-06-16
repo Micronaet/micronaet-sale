@@ -169,7 +169,7 @@ class SaleOrderLineError(orm.Model):
         _logger.warning('Pick IDS {}'.format(pick_ids))
         pdb.set_trace()
         for line_id in sl_linked:
-            self.write(cr, uid, [line], {
+            self.write(cr, uid, [line_id], {
                 'sl_id': sl_linked[line_id],
             }, context=context)
 
