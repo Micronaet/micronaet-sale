@@ -173,6 +173,7 @@ class SaleOrderLineError(orm.Model):
                 'sl_id': sl_linked[line_id],
             }, context=context)
 
+        _logger.warning('Errors corrected!')
         return True
 
     _columns = {
