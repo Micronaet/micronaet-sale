@@ -167,7 +167,7 @@ class SaleOrderLineError(orm.Model):
 
         # Remove linked lines:
         _logger.warning('Pick IDS {}'.format(pick_ids))
-        pdb.set_trace
+        pdb.set_trace()
         for line_id in sl_linked:
             self.write(cr, uid, [line], {
                 'sl_id': sl_linked[line_id],
