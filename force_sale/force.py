@@ -95,6 +95,7 @@ class SaleOrderLineError(orm.Model):
         error_ids = self.search(cr, uid, [
             ('sl_id', '=', False),
             ], context=context)
+        error_ids = error_ids[:2]
 
         pick_ids = {}  # Picking collected by date
         sl_linked = {}  # Line linked (closed after)
@@ -111,7 +112,7 @@ class SaleOrderLineError(orm.Model):
                     'date': date,
                     'min_date': date,
                     'origin': '',
-                    'partner_id': company_proxy.id,
+                    # 'partner_id': company_proxy.id,  # todo no partner
                     'force_pick_ref': date,
                 }, context=context)
 
@@ -166,7 +167,6 @@ class SaleOrderLineError(orm.Model):
 
         # Remove linked lines:
         _logger.warning('Pick IDS {}'.format(pick_ids))
-        pdb.set_trace()
         for line_id in sl_linked:
             self.write(cr, uid, [line_id], {
                 'sl_id': sl_linked[line_id],
