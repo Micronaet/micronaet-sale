@@ -41,6 +41,7 @@
         'security/ir.model.access.csv',
         'security/over_group.xml',    
         'force_view.xml',
+        'scheduler.xml'
         ],
     'active': False,
     'installable': True,
