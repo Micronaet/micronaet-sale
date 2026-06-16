@@ -95,7 +95,6 @@ class SaleOrderLineError(orm.Model):
         error_ids = self.search(cr, uid, [
             ('sl_id', '=', False),
             ], context=context)
-        error_ids = error_ids[:2]  # TODO debug
 
         pick_ids = {}  # Picking collected by date
         sl_linked = {}  # Line linked (closed after)
