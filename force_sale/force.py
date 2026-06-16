@@ -21,6 +21,7 @@ import os
 import sys
 import logging
 import openerp
+import pdb
 import openerp.netsvc as netsvc
 import openerp.addons.decimal_precision as dp
 from openerp.osv import fields, osv, expression, orm
@@ -62,43 +63,115 @@ class SaleOrderLineError(orm.Model):
     _name = 'sale.order.line.error'
     _description = 'Line error unload'
 
-    def get_force_pick(self, cr, uid, picking_type, context=None):
-        """ Generate template picking
-        """
-        company_id = 1
-        pick_pool = self.pool.get('stock.picking')
-
-        now = str(datetime.now())[:19]
-        date = now[:10]
-        data = {
-            # 'production_load_type': mode,
-            'date': date,
-            'min_date': date,
-            'origin': '',
-            'partner_id': company_id,
-            'picking_type_id': picking_type.id,
-            'state': 'done',
-            'force_pick_ref': date,
-            }
-        return pick_pool.create(cr, uid, data, context=context)
-
     def link_sl_document(self, cr, uid, context=None):
         """ Link SL document
         """
+        # Pool used:
+        user_pool = self.pool.get('res.users')
+        move_pool = self.pool.get('stock.move')
+        quant_pool = self.pool.get('stock.quant')
+        pick_pool = self.pool.get('stock.picking')
+
+        # Get company from user:
+        company_proxy = user_pool.browse(cr, uid, uid, context=context).company_id
+
+        # Read SL reference:
+        pdb.set_trace()
+        sl_type = company_proxy.sl_mrp_lavoration_id
+        if not sl_type:
+            raise osv.except_osv(
+                _('Error'),
+                _('Set up in company SL type!'))
+        sl_type_id = sl_type.id
+
+        # Extract stock:
+        stock_location = sl_type.default_location_src_id.id or False
+        mrp_location = sl_type.default_location_dest_id.id or False
+        if not(mrp_location and stock_location):
+            raise osv.except_osv(
+                _('Error'),
+                _('Set up in company location for stock and mrp!'))
+
+        # Search error line:
         error_ids = self.search(cr, uid, [
             ('sl_id', '=', False),
             ], context=context)
-        pick_ids = {}
+        error_ids = error_ids[:2]  # TODO debug
 
+        pick_ids = {}  # Picking collected by date
+        sl_linked = {}  # Line linked (closed after)
         for line in self.browse(cr, uid, error_ids, context=context):
+            error_qty = line.error_qty
             date = line.date
-            force_pick_ref = '%s%s' % (date[5:7], date[:4])
+            force_pick_ref = '%s%s' % (date[5:7], date[:4])  # All month
             if force_pick_ref not in pick_ids:
-                pick_ids[force_pick_ref] = self.get_force_pick(
-                    cr, uid, force_pick_ref, context=context)
-            pick_id = pick_ids[force_pick_ref]
-            # todo Create move for that picking:
-            # todo Create quants for that picking:
+                # Create new pick:
+                pick_ids[force_pick_ref] = pick_pool.create(cr, uid, {
+                    # 'production_load_type': mode,
+                    'picking_type_id': picking_type_id,
+                    'state': 'done',
+                    'date': date,
+                    'min_date': date,
+                    'origin': '',
+                    'partner_id': company_proxy.id,
+                    'force_pick_ref': date,
+                }, context=context)
+
+            # Loop on product component:
+            sl_id = pick_ids[force_pick_ref]  # All move in pick with correct month
+            product = line.product_id
+
+            # Loop (product, qty):
+            if product.dynamic_bom_line_ids:
+                components = [(l.product_id, error_qty * l.product_qty) for l in product.dynamic_bom_line_ids]
+            else:
+                # All other items will be unloaded single
+                # TODO manage service?
+                components = [(product, error_qty)]
+
+            for (component, product_uom_qty) in components:
+                # Stock move as unload:
+                move_pool.create(cr, uid, {
+                    'picking_id': sl_id,
+                    'location_id': stock_location,
+                    'location_dest_id': mrp_location,
+                    'picking_type_id': sl_type_id,
+                    'state': 'done',  # confirmed, available
+                    'origin': '',
+                    'date': date,
+                    'date_expected': date,
+
+                    'product_id': component.id,
+                    'product_uom_qty': product_uom_qty,
+                    'product_uom': component.uom_id.id,  # line.product_uom.id
+                    'name': component.name,
+
+                    # 'linked_sl_stock_move_id': load.id,  # link CL move
+                    # 'display_name': 'SL: %s' % line_proxy.product_id.name,
+                    # 'product_uom_qty',
+                    # 'product_uos',
+                    # 'product_uos_qty',
+                    }, context=context)
+
+                # Unload quants materials:
+                quant_pool.create(cr, uid, {
+                    'in_date': date,
+                    'cost': 0.0,  # TODO
+                    'location_id': stock_location,
+                    'product_id': component.id,
+                    'qty': - product_uom_qty,
+                    'lavoration_link_id': sl_id,
+                    }, context=context)
+
+                # Update sl_id for remove next time
+                sl_linked[line.id] = sl_id
+
+        # Remove linked lines:
+        for line_id in sl_linked:
+            self.write(cr, ui, [line], {
+                'sl_id': sl_linked[line_id],
+            }, context=context)
+
         return True
 
     _columns = {
@@ -106,8 +179,7 @@ class SaleOrderLineError(orm.Model):
         'product_id': fields.many2one('product.product', 'Product'),
         'date': fields.date('Date'),
         'note': fields.text('Note'),
-        'sl_id': fields.many2one(
-            'stock.picking', 'SL link'),
+        'sl_id': fields.many2one('stock.picking', 'SL link'),
         'done': fields.boolean('Done'),
         }
 
@@ -125,12 +197,14 @@ class SaleOrder(orm.Model):
             }, context=context)
         sol_pool = self.pool.get('sale.order.line')
         sol_ids = sol_pool.search(cr, uid, [
-            ('order_id', '=', ids[0])], context=context)
+            ('order_id', '=', ids[0]),
+        ], context=context)
         sol_pool.write(cr, uid, sol_ids, {
             'mx_closed': False,
             }, context=context)
-        return self.force_parameter_for_delivery_one(
-            cr, uid, ids, context=context)
+
+        # Clean order (or mark close):
+        return self.force_parameter_for_delivery_one(cr, uid, ids, context=context)
 
     def get_message_list(self, cr, uid, ids, context=None):
         """
@@ -178,8 +252,7 @@ class SaleOrder(orm.Model):
         sol_update = {}
 
         for line in sol_pool.browse(cr, uid, sol_ids, context=context):
-            sol_update[line.id] = round(
-                line.product_uom_qty * force_value / 100.0, 0)
+            sol_update[line.id] = round(line.product_uom_qty * force_value / 100.0, 0)
 
         for item_id in sol_update:  # update context to force CL (SL?)
             sol_pool.write(cr, uid, [item_id], {
@@ -191,7 +264,7 @@ class SaleOrder(orm.Model):
         return True
 
     def update_setted_force(self, cr, uid, ids, context=None):
-        """
+        """ Roberto
         """
         assert len(ids) == 1, 'Force once order a time!'
 
