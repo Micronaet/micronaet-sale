@@ -95,10 +95,6 @@ class SaleOrderLineError(orm.Model):
         error_ids = self.search(cr, uid, [
             ('sl_id', '=', False),
             ], context=context)
-
-        # TODO debug
-        error_ids.reverse()
-        error_ids = error_ids[:2]
         _logger.info('Found error: {}'.format(len(error_ids)))
 
         pick_ids = {}  # Picking collected by date
