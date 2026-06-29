@@ -225,7 +225,7 @@ class SaleOrder(orm.Model):
             if channel:
                 channel_pool.send_message(channel, message, item_id=order_id, reference=order.name)
         except:
-            _logger.error('Cannot send Telegram Message\{}'.format(sys.exc_info()))
+            _logger.error('Cannot send Telegram Message{}'.format(sys.exc_info()))
             return False
         return True
 
