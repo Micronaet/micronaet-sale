@@ -232,11 +232,8 @@ class SaleOrder(orm.Model):
     def action_button_supervisor_approve(self, cr, uid, ids, context=None):
         """ Approve supervisor
         """
-        self.send_telegram_approvation_message(
-            cr, uid, ids,
-            message='Supervisore approva l\'ordine',
-            context=context)
-
+        order_id = ids[0]
+        self.message_post(cr, uid, [order_id], body='Supervisore ha approvato', context=context)
         return self.write(cr, uid, ids, {
             'supervisor_approve': True,
         }, context=context)
@@ -244,11 +241,8 @@ class SaleOrder(orm.Model):
     def action_button_supervisor_deny(self, cr, uid, ids, context=None):
         """ Approve supervisor
         """
-        self.send_telegram_approvation_message(
-            cr, uid, ids,
-            message='Supervisore rimuove approvazione ordne',
-            context=context)
-
+        order_id = ids[0]
+        self.message_post(cr, uid, [order_id], body='Supervisore non ha approvato',  context=context)
         return self.write(cr, uid, ids, {
             'supervisor_approve': False,
         }, context=context)
