@@ -229,6 +229,31 @@ class SaleOrder(orm.Model):
             return False
         return True
 
+    def action_button_supervisor_approve(self, cr, uid, ids, context=None):
+        """ Approve supervisor
+        """
+        self.send_telegram_approvation_message(
+            cr, uid, ids,
+            message='Supervisore approva l\'ordine',
+            context=context)
+
+        return self.write(cr, uid, ids, {
+            'supervisor_approve': True,
+        }, context=context)
+
+    def action_button_supervisor_deny(self, cr, uid, ids, context=None):
+        """ Approve supervisor
+        """
+        self.send_telegram_approvation_message(
+            cr, uid, ids,
+            message='Supervisore rimuove approvazione ordne',
+            context=context)
+
+        return self.write(cr, uid, ids, {
+            'supervisor_approve': False,
+        }, context=context)
+
+
     def action_button_request_approve_deny(self, cr, uid, ids, context=None):
         """ Deny approvation
         """
@@ -331,6 +356,9 @@ class SaleOrder(orm.Model):
         'telegram_message': fields.text(
             'Telegram Message',
             help='Messaggio temporaneo per inserire un messaggio di Telegram e una nota all\'interno dell\'ordine'),
+        'supervisor_approve': fields.boolean(
+            'Approvato supervisore',
+            help='Spunta per indicare che il supervisore ha approvato questo ordine'),
         'request_approvation': fields.boolean('Richiesta approvazione'),
         'request_approvation_sent': fields.boolean('Richiesta approvazione inviata'),
         }

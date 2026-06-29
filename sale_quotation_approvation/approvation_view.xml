@@ -65,6 +65,15 @@
             <field name="arch" type="xml">
                 <button name="action_button_confirm" position="before">
                     <button name="action_button_add_telegram_note" string="Nota Telegram" type="object" icon="gtk-index" />
+
+                    <button name="action_button_supervisor_approve" string="Supervisore approva"
+                        type="object" icon="gtk-yes"
+                        attrs="{'invisible': ['|', ('supervisor_approve', '=', True), ('state', 'in', ('draft', 'sent', 'cancel'))]}"/>
+                    <button name="action_button_supervisor_deny" string="Supervisore non approva"
+                        type="object" icon="gtk-no"
+                        attrs="{'invisible': ['|', ('supervisor_approve', '=', False), ('state', 'in', ('draft', 'sent', 'cancel'))]}"/>
+                    <field name="supervisor_approve" invisible="1"/>
+
                     <button name="action_button_request_approve" string="Richiesta approvazione"
                         type="object" icon="gtk-help"
                         attrs="{'invisible': ['|', ('request_approvation', '=', True), ('state', 'not in', ('draft', 'sent'))]}"/>
@@ -72,6 +81,7 @@
                         type="object" icon="gtk-no"
                         attrs="{'invisible': [('request_approvation', '=', False)]}"/> <!-- if approved mode 2 change setup for confirmed order -->
                     <field name="request_approvation" invisible="1"/>
+
                     <button name="set_request_approvation_true" string="Visto!" invisible="not context.get('saw_mode')"
                             attrs="{'invisible': [('request_approvation', '=', False)]}" groups="sale_quotation_approvation.group_sale_order_approvation_manager"
                             icon="gtk-apply" type="object" />
@@ -93,8 +103,18 @@
             <field name="context">{'saw_mode': True}</field>
             <field name="domain">[('state', 'not in', ('draft', 'sent', 'cancel')), ('request_approvation', '=', True)]</field>
         </record>
+        <record id="sale_order_approve_supervisor_action" model="ir.actions.act_window">
+            <field name="name">Supervisione ordini</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', 'not in', ('draft', 'sent', 'cancel')), ('supervisor_approve', '=', False)]</field>
+        </record>
 
         <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="menu_sale_order_supervisor_approve"
+              groups="sale_quotation_approvation.group_sale_order_approvation_supervisor"
+              name="Supervisione ordini" parent="base.menu_sales" action="sale_order_approve_supervisor_action" sequence="5"/>
         <menuitem id="menu_sale_order_approve"
               groups="sale_quotation_approvation.group_sale_order_approvation_manager,sale_quotation_approvation.group_sale_order_approvation_user"
               name="Offerte da approvare" parent="base.menu_sales" action="sale_order_approve_action" sequence="5"/>
