@@ -247,7 +247,6 @@ class SaleOrder(orm.Model):
             'supervisor_approve': False,
         }, context=context)
 
-
     def action_button_request_approve_deny(self, cr, uid, ids, context=None):
         """ Deny approvation
         """
